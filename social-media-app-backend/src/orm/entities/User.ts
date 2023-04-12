@@ -1,10 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, BeforeUpdate, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 import { UserGroupMembership } from './UserGroupMembership';
 import { Role } from './Role';
 import { Post } from './Post';
 import { Friendship } from './Friendship';
 import { Comment } from './Comment';
 import { Reaction } from './Reaction';
+import bcrypt from 'bcrypt';
+import { AppDataSource } from '../config/data-source';
 
 @Entity()
 export class User {
@@ -29,8 +31,8 @@ export class User {
   @Column({ name: 'is_active', default: true, nullable: false })
     isActive: boolean;
 
-  @Column({ name: 'password_hash', nullable: false })
-    hashedPassword: string;
+  @Column({ name: 'password', nullable: false })
+    password: string;
 
   @CreateDateColumn({ name: 'created_at' })
     createdAt: Date;
@@ -59,10 +61,17 @@ export class User {
   @OneToMany(() => Friendship, friendship => friendship.responder)
     receivedFriendRequests: Friendship[];
 
-  @BeforeUpdate()
+  @BeforeInsert()
   hashPassword (): void {
-    const hashedPassword = 'a';
-    // const hashedPassword = hashMyPass(this.passwordHash)
-    this.hashedPassword = hashedPassword;
+    this.password = bcrypt.hashSync(this.password, 8);
+  }
+
+  async updatePassword (newPassword: string): Promise<User> {
+    this.password = bcrypt.hashSync(newPassword, 8);
+    return await AppDataSource.manager.save(this);
+  }
+
+  checkIfPasswordMatch (unencryptedPassword: string): boolean {
+    return bcrypt.compareSync(unencryptedPassword, this.password);
   }
 }

@@ -5,5 +5,4 @@ build/
 dist/
 tmp/
 temp/
-config/
 .env
