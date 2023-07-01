@@ -12,9 +12,7 @@
       "test": "echo \"Error: no test specified\" && exit 1",
       "typeorm": "typeorm-ts-node-commonjs",
       "migration:create": "npm run typeorm migration:create ./src/orm/migrations/migration",
-      "migration:run": "npm run typeorm migration:run",
-      // "seed:run": "npm run typeorm migration:run -- -d ./src/orm/config/ormconfig-seed.ts",
-      // "seed:create": "npm run typeorm migration:create ./src/orm/seeds/seed"
+      "migration:run": "npm run typeorm migration:run"
    },
    "author": "",
    "license": "ISC",
